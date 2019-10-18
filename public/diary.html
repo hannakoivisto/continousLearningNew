@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en-EN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Continous learning</title>
+    <link rel="stylesheet" href="stylesheets/style.css" />
+    <script src="https://code.jquery.com/jquery-3.4.1.js"
+        integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <h1>Continous learning - learning diary</h1>
+    <form action="http://localhost:3000/" id="topic" method="POST">
+        <div>
+            <p><label for="id">Id:</label></p>
+            <input type="text" id="id" name="topic_id"><br />
+
+            <p><label for="title">Title:</label></p>
+            <input type="text" id="title" name="topic_title"><br />
+
+            <p><label for="description">Description:</label></p>
+            <textarea id="description" name="topic_description"></textarea><br />
+
+            <p><label for="time">Time to master the topic:</label></p>
+            <input type="number" id="time" name="time_master"><br />
+
+            <p><label for="spent">Time spent (hours):</label></p>
+            <input type="number" id="spent" name="spent_time"><br />
+
+            <p><label for="source">Possible source:</label></p>
+            <input type="text" id="source" name="topic_source"><br />
+
+            <p><label for="date">Date when learning started:</label></p>
+            <input type="date" id="date" name="start_date"><br />
+
+            <!--fieldset ja legend ainakin tähän? checked -->
+            <p><label for="progress">In Progress?</label></p>
+            <input type="radio" id="yes" name="progress" value="yes"> Yes
+            <input type="radio" name="progress" value="no"> No<br />
+
+            <P><label for="completion">Completion Date:</label></P>
+            <input type="date" id="completion" name="completion_date"><br />
+
+            <div class="button">
+                <!--<button type="button" onclick="save()">Save topic</button>-->
+                <!--<input type="submit" value="Submit"-->
+                <input type="button" value="Add topic" onclick="luo()">
+            </div>
+
+        </div>
+    </form>
+    <h2>Lista</h2>
+    <ul id="lista">
+        <li></li>
+    </ul>
+    <!--<script src="javascript/script.js"></script>-->
+    <script>
+        $(document).ready(haekaikki)
+        function haekaikki() {
+            $.getJSON("/api/topics", function (uusi) {
+                console.dir(uusi);
+                $("#lista").empty();
+                for (let t of uusi) {
+                    $("#lista").append("<li>" + t.id + " " + t.title + " " + t.description + " " + t.time + " " + t.spent + " " + t.source + " " + t.date + " " + t.progress + " " + t.completion + "</li>");
+                }
+            })
+        }
+        function luo() {
+            let id = $("#id").val();
+            let title = $("#title").val();
+            let description = $("#description").val();
+            let time = $("#time").val();
+            let spent = $("#spent").val();
+            let source = $("#source").val();
+            let date = $("#date").val();
+            let progress = $("#progress").val();
+            let completion = $("#completion").val();
+            console.log(id + title + description + time + spent + source + date + progress + completion);
+            let topic = { id: id, title: title, description: description, time: time, spent: spent, source: source, date: date, progress: progress, completion: completion };
+
+            var settings = {
+                "async": true,
+                "crossDomain": true,
+                "url": "http://localhost:3000/api/topics/",
+                "method": "POST",
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                },
+                "data": JSON.stringify(topic)
+            }
+
+            $.ajax(settings).done(function (response) {
+                console.log(response);
+                haekaikki();
+            });
+        }
+    </script>
+</body>
+
+</html>
